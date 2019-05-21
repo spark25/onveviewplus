@@ -42,5 +42,6 @@ export default {
     .nav-links li{
         padding: 0 1em;
         cursor: pointer;
+        font-size: 1em;
     }
 </style>
