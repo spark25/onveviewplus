@@ -1,0 +1,45 @@
+{
+  "result": {
+    "problems": [
+      {
+        "id": "-796596260750017867_1554981420000V2",
+        "startTime": 1554981420000,
+        "endTime": -1,
+        "displayName": "867",
+        "impactLevel": "SERVICE",
+        "status": "OPEN",
+        "severityLevel": "ERROR",
+        "commentCount": 0,
+        "tagsOfAffectedEntities": [],
+        "rankedImpacts": [
+          {
+            "entityId": "SERVICE-70C56686E39D60B1",
+            "entityName": "Requests to unmonitored hosts",
+            "severityLevel": "ERROR",
+            "impactLevel": "SERVICE",
+            "eventType": "FAILURE_RATE_INCREASED"
+          }
+        ],
+        "affectedCounts": {
+          "INFRASTRUCTURE": 0,
+          "SERVICE": 1,
+          "APPLICATION": 0,
+          "ENVIRONMENT": 0
+        },
+        "recoveredCounts": {
+          "INFRASTRUCTURE": 0,
+          "SERVICE": 0,
+          "APPLICATION": 0,
+          "ENVIRONMENT": 0
+        },
+        "hasRootCause": false
+      }
+    ],
+    "monitored": {
+      "INFRASTRUCTURE": 1346,
+      "SERVICE": 295,
+      "APPLICATION": 3,
+      "ENVIRONMENT": 1
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "result": {
+    "id": "-796596260750017867_1554981420000V2",
+    "startTime": 1554981420000,
+    "endTime": 1554986700000,
+    "displayName": "867",
+    "impactLevel": "SERVICE",
+    "status": "CLOSED",
+    "severityLevel": "ERROR",
+    "commentCount": 0,
+    "tagsOfAffectedEntities": [],
+    "rankedEvents": [
+      {
+        "startTime": 1554981420000,
+        "endTime": 1554986700000,
+        "entityId": "SERVICE-70C56686E39D60B1",
+        "entityName": "Requests to unmonitored hosts",
+        "severityLevel": "ERROR",
+        "impactLevel": "SERVICE",
+        "eventType": "FAILURE_RATE_INCREASED",
+        "status": "CLOSED",
+        "severities": [
+          {
+            "context": "FAILURE_RATE",
+            "value": 0.380952388048172,
+            "unit": "Ratio"
+          }
+        ],
+        "isRootCause": false,
+        "service": "Requests to unmonitored hosts",
+        "serviceMethodGroup": "api-elb.prod.ff.vg-svc.com",
+        "affectedRequestsPerMinute": 2.8,
+        "userDefinedFailureRateThreshold": 5
+      }
+    ],
+    "rankedImpacts": [
+      {
+        "entityId": "SERVICE-70C56686E39D60B1",
+        "entityName": "Requests to unmonitored hosts",
+        "severityLevel": "ERROR",
+        "impactLevel": "SERVICE",
+        "eventType": "FAILURE_RATE_INCREASED"
+      }
+    ],
+    "affectedCounts": {
+      "INFRASTRUCTURE": 0,
+      "SERVICE": 0,
+      "APPLICATION": 0,
+      "ENVIRONMENT": 0
+    },
+    "recoveredCounts": {
+      "INFRASTRUCTURE": 0,
+      "SERVICE": 1,
+      "APPLICATION": 0,
+      "ENVIRONMENT": 0
+    },
+    "hasRootCause": false
+  }
+}
