@@ -18,6 +18,7 @@ export default {
 
 <style>
 @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+
 *{
   margin: 0;
   padding: 0;
@@ -25,10 +26,15 @@ export default {
   font-family: 'Poppins', sans-serif;
 }
 
+body{
+        background: var(--primary);
+    }
 :root {
   --primary: #2b2b2b; 
+  --less-dark: #303030;
   --error-red:#e74c3c;
   --ok-green:#1abc9c;
   --warning-amber:#f39c12;
+  --font-white: #ecf0f1;
 }
 </style>

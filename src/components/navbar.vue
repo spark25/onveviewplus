@@ -1,9 +1,10 @@
 <template>
 <div class="nav">
-    <div class="brand">OneView+</div>
+    <router-link :to="{ name: 'index'}">OneView+</router-link>
     <ul class="nav-links">
-        <li>Elevate</li>
+        <li><router-link to="login">Elevate</router-link> </li>
     </ul>
+    
 </div>
 
 </template>
@@ -33,15 +34,21 @@ export default {
     .nav .nav-links{    
         list-style: none;
     }
-    .brand{
-        padding: 0 1em;
+    .router-link-active{
+        text-decoration: none;
+        color: var(--font-white);
+         padding: 0 1em;
         font-size: 1.2em;
         cursor: pointer;
     }
 
-    .nav-links li{
+    .nav-links li a{
         padding: 0 1em;
-        cursor: pointer;
         font-size: 1em;
+        text-decoration: none;
+        color: var(--font-white)
     }
+
+    
+
 </style>
