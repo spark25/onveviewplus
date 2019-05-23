@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Index from "./views/index.vue";
 import Login from "./views/login.vue";
 import AddEnv from "./views/addEnv.vue";
+import EditEnv from "./views/editEnv.vue";
 
 Vue.use(Router);
 
@@ -26,6 +27,12 @@ export default new Router({
       path: "/addEnv",
       name: "addEnv",
       component: AddEnv
+    },
+
+    {
+      path: "/editEnv/:env_id",
+      name: "editEnv",
+      component: EditEnv
     }
   ]
 });

@@ -3,9 +3,10 @@
         <router-link :to="{ name: 'addEnv'}"><i class="material-icons md-48" id="addEnvBtn">add_circle</i></router-link>
         <div class="container">
         <div class="problem_box" v-for="env in environments" :key="env.id" :class="{ problem_box_error: env.problem_obj.problem_count>0 }">
-            <div class="env_title">{{env.title}}</div><span id="deleteBtn" @click="deleteEnv(env.id)"><i class="material-icons">delete</i></span>
+            <div class="env_title"  @click="getProblemFeed(env.problem_feed, env.problem_details, env.auth_token)">{{env.title}}</div><span id="deleteBtn" @click="deleteEnv(env.id)"><i class="material-icons">delete</i></span>
+            
             <div class="problem_data">
-                <div class="problem_count">{{ env.problem_obj.problem_count }}</div>
+                <div class="problem_count"  @click="getProblemFeed(env.problem_feed, env.problem_details,env.auth_token)">{{ env.problem_obj.problem_count }}</div>
                 <ul class="problem_area">
                     <li>INFRASTRUCTURE: <span>{{ env.problem_obj.infra_problems }}</span> </li>
                     <li>SERVICE: <span>{{ env.problem_obj.service_problems }}</span></li>
@@ -13,10 +14,11 @@
                     <li>ENVIRONMENT: <span>{{ env.problem_obj.env_problems }}</span></li>
                 </ul>
             </div>
-            <span id="editBtn"><i class="material-icons">edit</i></span>
+            <router-link :to="{ name: 'editEnv', params:{env_id:env.id}}"><i class="material-icons" id="editBtn">edit</i></router-link>
         </div>
        
     </div>
+    <div v-if="show_problem_feed"> <ProblemFeed/></div>
     </div>
     
 </template>
@@ -24,12 +26,18 @@
 <script>
 
 import db from '@/firebase/firestore'
+import ProblemFeed from '@/components/problem_feed'
 export default {
     name: 'Index',
+    components:{
+        ProblemFeed
+    },
     data(){
         return{
             environments:[],
-            refresh_rate: 100000
+            refresh_rate: 100000,
+            show_problem_feed: true,
+            problems:[]
         }
     },
     methods: {
@@ -59,7 +67,59 @@ export default {
                    return env.id != id
                })
            })
-        }
+        },
+        
+        getProblemFeed(link, detail_link, token){
+            fetch('problem_feed.json')
+            .then((res) => res.json())
+            .then((data) => {
+                if(data.result.problems.length>0){
+                    data.result.problems.forEach(element => {
+                        let timestamp =  new Date(element.startTime)
+                        let outage = this.getOutage(timestamp)
+                        let problem_details=this.getProblemDetail(element.id, detail_link, token)
+                        let problem = {
+                            'p_id' : element.id,
+                            'entity_name' : element.rankedImpacts[0].entityName,
+                            'display_name' : element.displayName,
+                            'outage' : outage,
+                            'problem_details' : problem_details
+                        }
+                       
+                        this.problems.push(problem)
+                        console.log(typeof(problem_details))
+                    });
+                }
+                this.problems.forEach(el =>{
+                    console.log(el)
+                })
+            })
+        },
+
+        getProblemDetail(p_id, detail_link, token){
+            let link = `${detail_link}${p_id}?Api-Token=${token}`
+            fetch('problem_details.json')
+            .then((res) => res.json())
+            .then((data) => {
+               data.result.rankedEvents[0].eventType
+            })
+
+        },
+        
+        getOutage(startTimestamp){
+            let the_date = startTimestamp.toDateString()
+            let the_time = startTimestamp.toLocaleTimeString()
+            let seconds = (new Date()-startTimestamp)/1000
+            let hours = Math.floor(seconds/3600)
+            let min = Math.floor(seconds % 3600 / 60)
+            let sec = Math.floor(seconds % 3600 % 60);
+
+            return `Since ${the_date} ${the_time} for ${hours}hrs ${min}min ${sec}sec`
+   
+ }
+    },
+
+    computed:{
         
     },
 
@@ -71,11 +131,15 @@ export default {
                 let env = doc.data()
                 env.id = doc.id
                 let env_obj = {
-                    'id' : env.id,
                     'title' : env.title,
-                    'api_link' : `${env.domain}/e/${env.id}/api/v1/problem/status?Api-Token=${env.auth_token}`,
+                    'id' : env.id,
+                    'env_id' : env.env_id,
+                    'auth_token': env.auth_token,
+                    'problem_status' : `${env.domain}/e/${env.env_id}/api/v1/problem/status?Api-Token=${env.auth_token}`,
+                    'problem_feed' : `${env.domain}/e/${env.env_id}/api/v1/problem/feed?status=OPEN&Api-Token=${env.auth_token}`,
+                    'problem_details' : `${env.domain}/e/${env.env_id}/api/v1/problem/details/`,
                     'problem_obj' : {
-                        'problem_count' : 0,
+                        'problem_count' : 6,
                         'infra_problems' : 0, 
                         'service_problems' : 0,
                         'app_problems' : 0,
@@ -104,11 +168,12 @@ export default {
  
     .problem_box{
         color: var(--font-white);
-        padding: 1rem;
+        padding: 0.8rem;
         box-shadow: 0px 10px 20px rgb(35,35,35);
         border: 2px solid var(--ok-green);
         position: relative;
-        /* border-radius: 10px; */
+        border-radius: 10px;
+        
     }
 
     .problem_box_error{
@@ -116,15 +181,41 @@ export default {
     }
 
     .env_title{
-         font-size: 1.5rem;
+         font-size: 1.2rem;
+         text-transform: uppercase;
+         font-family: 'Oswald', sans-serif;
+         cursor: pointer;
     }
-    .problem_count{
+
+    .env_title::after{
+         content: '';
+         display: block;
+         width: 100%;
+         height: 2px;
+         background: #4b4b4b;
+    }
+
+    .problem_data{
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        align-items: center;
+        justify-content: center;
+        margin-top: 5px;
+    }
+
+     .problem_count{
         text-align: center;
-        font-size: 2rem;
+        font-size: 3rem;
+        color:#fff;
+        font-family: 'Oswald', sans-serif;
+        cursor: pointer;
+
     }
     .problem_area{
         list-style : none;
         font-size: 0.7rem;
+        padding-left: 2em;
+        
     }
     .problem_area li span{
         color: white;
@@ -133,19 +224,16 @@ export default {
 
     #addEnvBtn{
        color: #c2c2c2;
-       position: absolute;
+       position: fixed;
        bottom: 4vh;
        right: 20px;
        cursor: pointer;
     }
 
-    #addEnvBtn:hover{
+    #addEnvBtn:hover, #editBtn:hover, #deleteBtn:hover{
         color: var(--font-white);
     }
 
-    i:hover{
-         color: var(--font-white);
-    }
     /* Set size of material icon */
     .material-icons.md-48 { font-size: 48px; }
 

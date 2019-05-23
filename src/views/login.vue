@@ -23,15 +23,16 @@ export default {
 
 <style scoped>
 .box{
-  width: 400px;
+  width: 40vmax;
   padding: 40px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
   background: var(--less-dark);
-  box-shadow: 0px 10px 20px rgb(40, 40, 40);
+  /* box-shadow: 0px 10px 20px rgb(40, 40, 40); */
   text-align: center;
+  border-radius: 10px;
 }
 .box h2{
   color: var(--font-white);
@@ -46,14 +47,14 @@ export default {
   text-align: center;
   border: 2px solid #3498db;
   padding: 14px 10px;
-  width: 200px;
+  width: 20vmax;
   outline: none;
   color: white;
-  border-radius: 24px;
+  border-radius: 10px;
   transition: 0.25s;
 }
 .box input[type = "email"]:focus,.box input[type = "password"]:focus{
-  width: 280px;
+  width: 30vmax;
   border-color: #2ecc71;
 }
 .box input[type = "submit"]{
@@ -66,7 +67,7 @@ export default {
   padding: 14px 40px;
   outline: none;
   color: white;
-  border-radius: 24px;
+  border-radius: 10px;
   transition: 0.25s;
   cursor: pointer;
 }

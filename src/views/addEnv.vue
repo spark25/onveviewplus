@@ -2,6 +2,7 @@
     <div class="addEnv">
         <form class="box" @submit.prevent="addEnv">
             <h2>Add a new Environment</h2>
+            <div v-if="feedback" class="feedback">All entries are required</div>
             <input type="text" name="" placeholder="Enviroment Name" v-model="name">
             <input type="text" name="" placeholder="Enviroment ID" v-model="env_id">
             <input type="text" name="" placeholder="Enviroment Domain" v-model="domain">
@@ -31,10 +32,10 @@ export default {
             if(this.name && this.env_id && this.domain && this.auth_token){
                 this.feedback = null;
                 db.collection('environments').add({
-                    id : this.env_id,
-                    title: this.name,
-                    domain: this.domain,
-                    auth_token: this.auth_token,
+                    env_id : this.env_id.trim(),
+                    title: this.name.trim(),
+                    domain: this.domain.trim(),
+                    auth_token: this.auth_token.trim(),
                     active:this.active
                 })
                 .then(() =>{
@@ -42,6 +43,9 @@ export default {
                 })
                 .catch((err)=>{console.error("Something went wrong!")})
 
+            }
+            else{
+              this.feedback = true;
             }
         }
     }
@@ -51,15 +55,16 @@ export default {
 
 <style scoped>
 .box{
-  width: 400px;
+  width: 40vmax;
   padding: 40px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
   background: var(--less-dark);
-  box-shadow: 0px 10px 20px rgb(40, 40, 40);
+  /* box-shadow: 0px 10px 20px rgb(40, 40, 40); */
   text-align: center;
+  border-radius: 10px;
 }
 .box h2{
   color: var(--font-white);
@@ -73,14 +78,14 @@ export default {
   text-align: center;
   border: 2px solid #3498db;
   padding: 14px 10px;
-  width: 200px;
+  width: 20vmax;
   outline: none;
   color: white;
-  border-radius: 24px;
+  border-radius: 10px;
   transition: 0.25s;
 }
 .box input[type = "text"]:focus,.box input[type = "password"]:focus{
-  width: 280px;
+  width: 30vmax;
   border-color: #2ecc71;
 }
 .box input[type = "submit"]{
@@ -93,12 +98,14 @@ export default {
   padding: 14px 40px;
   outline: none;
   color: white;
-  border-radius: 24px;
+  border-radius: 10px;
   transition: 0.25s;
   cursor: pointer;
 }
 .box input[type = "submit"]:hover{
   background: #2ecc71;
 }
-
+.feedback{
+  color: var(--error-red)
+}
 </style>
