@@ -33,6 +33,39 @@
           "ENVIRONMENT": 0
         },
         "hasRootCause": false
+      },
+      {
+        "id": "_1554981420000V2",
+        "startTime": 14345465466,
+        "endTime": -1,
+        "displayName": "867",
+        "impactLevel": "SERVICE",
+        "status": "OPEN",
+        "severityLevel": "ERROR",
+        "commentCount": 0,
+        "tagsOfAffectedEntities": [],
+        "rankedImpacts": [
+          {
+            "entityId": "SERVICE-70C56686E39D60B1",
+            "entityName": "SOmething",
+            "severityLevel": "ERROR",
+            "impactLevel": "SERVICE",
+            "eventType": "FAILURE_RATE_INCREASED"
+          }
+        ],
+        "affectedCounts": {
+          "INFRASTRUCTURE": 0,
+          "SERVICE": 1,
+          "APPLICATION": 0,
+          "ENVIRONMENT": 0
+        },
+        "recoveredCounts": {
+          "INFRASTRUCTURE": 0,
+          "SERVICE": 0,
+          "APPLICATION": 0,
+          "ENVIRONMENT": 0
+        },
+        "hasRootCause": false
       }
     ],
     "monitored": {

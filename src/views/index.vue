@@ -3,10 +3,10 @@
         <router-link :to="{ name: 'addEnv'}"><i class="material-icons md-48" id="addEnvBtn">add_circle</i></router-link>
         <div class="container">
         <div class="problem_box" v-for="env in environments" :key="env.id" :class="{ problem_box_error: env.problem_obj.problem_count>0 }">
-            <div class="env_title"  @click="getProblemFeed(env.problem_feed, env.problem_details, env.auth_token)">{{env.title}}</div><span id="deleteBtn" @click="deleteEnv(env.id)"><i class="material-icons">delete</i></span>
+            <div class="env_title"  @click="getProblemFeed(env.title,env.problem_feed, env.problem_details, env.auth_token)">{{env.title}}</div><span id="deleteBtn" @click="deleteEnv(env.id)"><i class="material-icons">delete</i></span>
             
             <div class="problem_data">
-                <div class="problem_count"  @click="getProblemFeed(env.problem_feed, env.problem_details,env.auth_token)">{{ env.problem_obj.problem_count }}</div>
+                <div class="problem_count"  @click="getProblemFeed(env.title,env.problem_feed, env.problem_details,env.auth_token)">{{ env.problem_obj.problem_count }}</div>
                 <ul class="problem_area">
                     <li>INFRASTRUCTURE: <span>{{ env.problem_obj.infra_problems }}</span> </li>
                     <li>SERVICE: <span>{{ env.problem_obj.service_problems }}</span></li>
@@ -18,7 +18,13 @@
         </div>
        
     </div>
-    <div v-if="show_problem_feed"> <ProblemFeed/></div>
+    <div v-if="show_problem_feed">
+        <div class="feed_head">
+            <div class="feed_title">{{ feed_head }}</div>
+            <i class="material-icons close" @click="closeProblemFeed">close</i>
+        </div>
+        <ProblemFeed v-bind:problems="problems"></ProblemFeed>
+    </div>
     </div>
     
 </template>
@@ -36,13 +42,17 @@ export default {
         return{
             environments:[],
             refresh_rate: 100000,
-            show_problem_feed: true,
-            problems:[]
+            problems:[],
+            show_problem_feed: false,
+            feed_head:''
         }
     },
     methods: {
-        
+        closeProblemFeed(){
+            this.show_problem_feed = false
+        },
         getProblemStatus(){
+           
             setInterval(() => {
                 this.environments.forEach(el => {
                     fetch('problem_status.json')
@@ -55,7 +65,7 @@ export default {
                             'app_problems' : data.result.openProblemCounts.APPLICATION,
                             'env_problems' : data.result.openProblemCounts.ENVIRONMENT
                         }
-                    })
+                    }).catch((err)=>{console.error(err)})
                 });
             },this.refresh_rate)
         },
@@ -69,7 +79,10 @@ export default {
            })
         },
         
-        getProblemFeed(link, detail_link, token){
+        getProblemFeed(head,link, detail_link, token){
+            this.feed_head = head
+            this.show_problem_feed = true
+            this.problems = []
             fetch('problem_feed.json')
             .then((res) => res.json())
             .then((data) => {
@@ -87,13 +100,9 @@ export default {
                         }
                        
                         this.problems.push(problem)
-                        console.log(typeof(problem_details))
                     });
                 }
-                this.problems.forEach(el =>{
-                    console.log(el)
-                })
-            })
+            }).catch((err)=>{console.error(err)})
         },
 
         getProblemDetail(p_id, detail_link, token){
@@ -148,7 +157,7 @@ export default {
                 }
                 this.environments.push(env_obj)
             })
-        }).catch((err)=>{console.error("Something went wrong!")})
+        }).catch((err)=>{console.error(err)})
 
         this.getProblemStatus()
 
@@ -173,6 +182,11 @@ export default {
         border: 2px solid var(--ok-green);
         position: relative;
         border-radius: 10px;
+        
+    }
+
+    .problem_box:hover{
+        box-shadow: 0px 10px 25px rgb(20, 20, 20);
         
     }
 
@@ -252,6 +266,25 @@ export default {
         bottom:5px;
         color: #c2c2c2;
         cursor: pointer;
+    }
+
+    .close{
+    color: var(--font-white);
+    cursor: pointer;
+    }
+    .close:hover{
+    color: var(--error-red);
+    }
+    .feed_head{
+        display: flex;
+        justify-content: space-between;
+        margin: 0 5%;
+        padding: 0.5em;
+    }
+
+    .feed_title{
+        text-transform: uppercase;
+        color: var(--font-white);
     }
     
 </style>
