@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import db from '@/firebase/firestore' 
+import fb from '@/firebase/init' 
 export default {
     name:"AddEnv",
     data(){
@@ -31,7 +31,7 @@ export default {
         addEnv(){
             if(this.name && this.env_id && this.domain && this.auth_token){
                 this.feedback = null;
-                db.collection('environments').add({
+                fb.db.collection('environments').add({
                     env_id : this.env_id.trim(),
                     title: this.name.trim(),
                     domain: this.domain.trim(),

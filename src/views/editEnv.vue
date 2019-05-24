@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import db from '@/firebase/firestore' 
+import fb from '@/firebase/init' 
 export default {
     name: 'EditEnv',
     data(){
@@ -27,7 +27,7 @@ export default {
         editEnv(){
             if(this.environment.title){
                 this.feedback = null;
-                db.collection('environments').doc(this.environment.id).update({
+                fb.db.collection('environments').doc(this.environment.id).update({
                     env_id : this.environment.env_id.trim(),
                     title: this.environment.title.trim(),
                     domain: this.environment.domain.trim(),
@@ -45,7 +45,7 @@ export default {
         }
     },
     created(){
-        let env_ref = db.collection('environments').doc(this.$route.params.env_id)
+        let env_ref = fb.db.collection('environments').doc(this.$route.params.env_id)
         env_ref.get().then(doc => {
                 this.environment = doc.data()
                 this.environment.id = doc.id

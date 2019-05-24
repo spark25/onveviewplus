@@ -1,21 +1,40 @@
 <template>
     <div class="login_box">
-        <form class="box">
-            <h2>Login to Elevate</h2>
-            <input type="email" name="" placeholder="Username" v-bind="email">
-            <input type="password" name="" placeholder="Password" v-bind="passowrd">
+        <form class="box" @submit.prevent="login">
+           <h2>Login to Elevate</h2>
+           <div class="feedback" v-if="feedback">{{feedback}}</div>
+            <input type="email" name="" placeholder="Username" v-model="email">
+            <input type="password" name="" placeholder="Password" v-model="password">
             <input type="submit" name="" value="Login">
         </form>
     </div>
 </template>
 
 <script>
+import fb from '@/firebase/init'
 export default {
     data(){
         return{
             email : "",
-            passowrd: ""
+            password: "",
+            feedback: null,
         }
+    },
+
+    methods:{
+      login(){
+        fb.auth.signInWithEmailAndPassword(this.email, this.password)
+        .then((token) =>{
+           this.$router.push({ name: 'index'})
+          //  this.$router.go({path: this.$router.path})
+        })
+        .catch((error) => {
+              // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        this.feedback = errorMessage;
+        });
+      }
     }
 
 }
@@ -74,5 +93,9 @@ export default {
 .box input[type = "submit"]:hover{
   background: #2ecc71;
 }
-
+.feedback{
+  font-size: 0.8em;
+  color: var(--error-red);
+  padding: 5px 5px;
+}
 </style>

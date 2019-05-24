@@ -1,9 +1,10 @@
 <template>
     <div class="problem_details_box">
-        <div v-for="problem in problems" class="container">      
+        <div v-for="problem in problems" class="container" :key="problem.p_id">      
             <div class="entity_name">{{problem.entity_name}}</div>
-            <div class="display_name">Problem No.: {{problem.display_name}}</div>
-            <div class="outage">{{problem.outage}}</div>
+            <div class="display_name">Problem No.: <span>{{problem.display_name}}</span></div>
+            <div class="event_type">{{ problem.event_type }}</div>
+            <div class="outage">Since <span style="color:#fdcb6e">{{problem.outage.date_time}}</span> for <span style="color:#ff7675">{{problem.outage.outage}}</span></div>
         </div>
     </div>
     
@@ -43,6 +44,7 @@ export default {
     color: var(--font-white);
     margin-bottom: 0.5em;
     border: 1px solid var(--less-dark);
+    font-size: 0.8em;
 }
 
 .container:hover{
@@ -53,6 +55,12 @@ export default {
 .problem_details_box{
     margin: auto 5%;
     
+}
+.display_name span{
+    color:#3498db;
+}
+.event_type{
+    color: var(--error-red);
 }
 
 </style>

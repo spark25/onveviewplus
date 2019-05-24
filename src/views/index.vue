@@ -1,9 +1,10 @@
 <template>
     <div>
-        <router-link :to="{ name: 'addEnv'}"><i class="material-icons md-48" id="addEnvBtn">add_circle</i></router-link>
+        <router-link v-if="isLoggedIn" :to="{ name: 'addEnv'}"><i class="material-icons md-48" id="addEnvBtn">add_circle</i></router-link>
         <div class="container">
-        <div class="problem_box" v-for="env in environments" :key="env.id" :class="{ problem_box_error: env.problem_obj.problem_count>0 }">
-            <div class="env_title"  @click="getProblemFeed(env.title,env.problem_feed, env.problem_details, env.auth_token)">{{env.title}}</div><span id="deleteBtn" @click="deleteEnv(env.id)"><i class="material-icons">delete</i></span>
+        <div class="problem_box" v-for="env in environments" :key="env.id" :class="{ problem_box_error: env.problem_obj.problem_count>0 , fetch_error: env.fetch_error }">
+            <div class="env_title"  @click="getProblemFeed(env.title,env.problem_feed, env.problem_details, env.auth_token)">{{env.title}}</div>
+            <span v-if="isLoggedIn"     id="deleteBtn" @click="deleteEnv(env.id)"><i class="material-icons">delete</i></span>
             
             <div class="problem_data">
                 <div class="problem_count"  @click="getProblemFeed(env.title,env.problem_feed, env.problem_details,env.auth_token)">{{ env.problem_obj.problem_count }}</div>
@@ -14,7 +15,7 @@
                     <li>ENVIRONMENT: <span>{{ env.problem_obj.env_problems }}</span></li>
                 </ul>
             </div>
-            <router-link :to="{ name: 'editEnv', params:{env_id:env.id}}"><i class="material-icons" id="editBtn">edit</i></router-link>
+            <router-link v-if="isLoggedIn" :to="{ name: 'editEnv', params:{env_id:env.id}}"><i class="material-icons" id="editBtn">edit</i></router-link>
         </div>
        
     </div>
@@ -31,7 +32,7 @@
 
 <script>
 
-import db from '@/firebase/firestore'
+import fb from '@/firebase/init'
 import ProblemFeed from '@/components/problem_feed'
 export default {
     name: 'Index',
@@ -41,10 +42,12 @@ export default {
     data(){
         return{
             environments:[],
-            refresh_rate: 100000,
+            refresh_rate: 10000,
             problems:[],
             show_problem_feed: false,
-            feed_head:''
+            feed_head:'',
+            isLoggedIn:false,
+            
         }
     },
     methods: {
@@ -55,7 +58,7 @@ export default {
            
             setInterval(() => {
                 this.environments.forEach(el => {
-                    fetch('problem_status.json')
+                    fetch(el.problem_status)
                     .then((res) => res.json())
                     .then(data =>{
                         el.problem_obj = {
@@ -65,13 +68,13 @@ export default {
                             'app_problems' : data.result.openProblemCounts.APPLICATION,
                             'env_problems' : data.result.openProblemCounts.ENVIRONMENT
                         }
-                    }).catch((err)=>{console.error(err)})
+                    }).catch((err)=>{el.fetch_error = true})
                 });
             },this.refresh_rate)
         },
 
         deleteEnv(id){
-           db.collection('environments').doc(id).delete()
+           fb.db.collection('environments').doc(id).delete()
            .then(() => {
                this.environments = this.environments.filter((env) => {
                    return env.id != id
@@ -83,37 +86,37 @@ export default {
             this.feed_head = head
             this.show_problem_feed = true
             this.problems = []
-            fetch('problem_feed.json')
+            fetch(link)
             .then((res) => res.json())
             .then((data) => {
                 if(data.result.problems.length>0){
                     data.result.problems.forEach(element => {
                         let timestamp =  new Date(element.startTime)
                         let outage = this.getOutage(timestamp)
-                        let problem_details=this.getProblemDetail(element.id, detail_link, token)
+                        // let problem_details=this.getProblemDetail(element.id, detail_link, token)
                         let problem = {
                             'p_id' : element.id,
                             'entity_name' : element.rankedImpacts[0].entityName,
                             'display_name' : element.displayName,
-                            'outage' : outage,
-                            'problem_details' : problem_details
+                            'event_type' : element.rankedImpacts[0].eventType,
+                            'outage' : outage        
                         }
                        
-                        this.problems.push(problem)
+                        this.problems.push(problem) 
                     });
                 }
             }).catch((err)=>{console.error(err)})
         },
 
-        getProblemDetail(p_id, detail_link, token){
-            let link = `${detail_link}${p_id}?Api-Token=${token}`
-            fetch('problem_details.json')
-            .then((res) => res.json())
-            .then((data) => {
-               data.result.rankedEvents[0].eventType
-            })
+        // getProblemDetail(p_id, detail_link, token){
+        //     let link = `${detail_link}${p_id}?Api-Token=${token}`
+        //     fetch('problem_details.json')
+        //     .then((res) => res.json())
+        //     .then((data) => {
+        //        data.result.rankedEvents[0].eventType
+        //     })
 
-        },
+        // },
         
         getOutage(startTimestamp){
             let the_date = startTimestamp.toDateString()
@@ -122,8 +125,10 @@ export default {
             let hours = Math.floor(seconds/3600)
             let min = Math.floor(seconds % 3600 / 60)
             let sec = Math.floor(seconds % 3600 % 60);
-
-            return `Since ${the_date} ${the_time} for ${hours}hrs ${min}min ${sec}sec`
+            return {
+                "date_time": `${the_date} ${the_time} `,
+                "outage": `${hours} hrs : ${min} min : ${sec}sec`
+            }
    
  }
     },
@@ -133,8 +138,14 @@ export default {
     },
 
     created(){
+        //Check if user is logged in
+         fb.auth.onAuthStateChanged(user => {
+            if(user){
+                this.isLoggedIn = true
+            }
+        })
         // fetch environment collection from firestore
-        db.collection('environments').get()
+        fb.db.collection('environments').get()
         .then(snapshot => {
             snapshot.forEach(doc => {
                 let env = doc.data()
@@ -148,12 +159,13 @@ export default {
                     'problem_feed' : `${env.domain}/e/${env.env_id}/api/v1/problem/feed?status=OPEN&Api-Token=${env.auth_token}`,
                     'problem_details' : `${env.domain}/e/${env.env_id}/api/v1/problem/details/`,
                     'problem_obj' : {
-                        'problem_count' : 6,
+                        'problem_count' : 0,
                         'infra_problems' : 0, 
                         'service_problems' : 0,
                         'app_problems' : 0,
                         'env_problems' : 0
-                    }
+                    },
+                    'fetch_error' : false
                 }
                 this.environments.push(env_obj)
             })
@@ -192,6 +204,10 @@ export default {
 
     .problem_box_error{
         border: 3px solid var(--error-red);
+    }
+
+    .fetch_error{
+        border: 3px solid var(--warning-amber);
     }
 
     .env_title{
@@ -242,6 +258,8 @@ export default {
        bottom: 4vh;
        right: 20px;
        cursor: pointer;
+       z-index: 999;
+       margin-top: 20px;
     }
 
     #addEnvBtn:hover, #editBtn:hover, #deleteBtn:hover{

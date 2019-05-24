@@ -17,7 +17,7 @@
             "entityName": "Requests to unmonitored hosts",
             "severityLevel": "ERROR",
             "impactLevel": "SERVICE",
-            "eventType": "FAILURE_RATE_INCREASED"
+            "eventType": "Bad stuff happened"
           }
         ],
         "affectedCounts": {
