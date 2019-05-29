@@ -59,7 +59,7 @@ let router = new Router({
 //       //go to login
 //       next({
 //         path: "/login",
-//         query: to.fullPath
+//         query:  { redirect: to.fullPath }
 //       });
 //     } else {
 //       //Proceed to route
@@ -70,7 +70,7 @@ let router = new Router({
 //       //go to index
 //       next({
 //         path: "/",
-//         query: to.fullPath
+//         query: query:  { redirect: to.fullPath }
 //       });
 //     } else {
 //       //Proceed to route
