@@ -70,7 +70,7 @@ let router = new Router({
 //       //go to index
 //       next({
 //         path: "/",
-//         query: query:  { redirect: to.fullPath }
+//         query:  { redirect: to.fullPath }
 //       });
 //     } else {
 //       //Proceed to route
